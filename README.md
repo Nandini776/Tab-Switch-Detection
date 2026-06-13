@@ -4,13 +4,13 @@ This is a simple browser- based interview monitoring system which dtects tab swi
 
 it is developed using HTML, CSS, and JavaScript.
 
-##Technologies Used
+<h1>Technologies Used</h1>
 -HTML
 -CSS
 -JavaScript
 
 
-##Features
+<h1>Features</h1>h1>
 * Full Screen Mode
 * Tab swith Detection 
 * Warning Counter
