@@ -1,139 +1,59 @@
-let warningCount = 0;
-let tabSwitchCount = 0;
-let fullscreenExitCount = 0;
+let warnCount=0;
+let tabSwitchCount=0;
+let fullscreenExitCount=0;
 
-// Elements
-const logsDiv = document.getElementById("logs");
-const warningDiv = document.getElementById("warningCount");
-const statusDiv = document.getElementById("status");
-const startBtn = document.getElementById("startBtn");
-const tabCountDiv = document.getElementById("tabCount");
-const fullscreenCountDiv = document.getElementById("fullscreenCount");
-const timerDiv = document.getElementById("timer");
-
-// Add log entry
-function addLog(message) {
-
-    const time = new Date().toLocaleTimeString();
-
-    const log = document.createElement("p");
-    log.innerText = `${time} - ${message}`;
-
-    logsDiv.appendChild(log);
-
-    // Auto scroll
-    logsDiv.scrollTop = logsDiv.scrollHeight;
-
-    console.log({
-        event: message,
-        timestamp: new Date().toISOString()
-    });
+// Add activity to log
+function addLog(message){
+    let currentTime=new Date().toLocaleTimeString();
+    logs.innerHTML+=`<p>${currentTime} - ${message}</p>`;
 }
 
-// Warning handler
-function issueWarning(reason) {
-
-    warningCount++;
-
-    warningDiv.innerText = warningCount;
-
+// Show warning
+function showWarning(reason){
+    warnCount++;
+    warningCount.innerText=warnCount;
     addLog(reason);
 
-    if (warningCount >= 3) {
-
-        statusDiv.innerText = "TEST TERMINATED";
-
+    if(warnCount>=3){
+        status.innerText="TERMINATED";
         alert("Test Terminated");
-
         return;
     }
 
-    alert(`Warning ${warningCount}/3\n${reason}`);
+    alert("Warning "+warnCount+"/3");
 }
 
-// Timer
-function startTimer(duration) {
+// Start exam
+function startExam(){
+    status.innerText="Active";
+    let timeLeft=3600;
 
-    let time = duration;
+    setInterval(function(){
+        let minutes=Math.floor(timeLeft/60);
+        let seconds=timeLeft%60;
+        timer.innerText=minutes+":"+seconds;
+        timeLeft--;
+    },1000);
 
-    const countdown = setInterval(() => {
-
-        let minutes = Math.floor(time / 60);
-        let seconds = time % 60;
-
-        timerDiv.innerText =
-            `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-
-        time--;
-
-        if (time < 0) {
-
-            clearInterval(countdown);
-
-            statusDiv.innerText = "EXAM FINISHED";
-
-            addLog("Timer Expired");
-
-            alert("Time Over!");
-        }
-
-    }, 1000);
+    document.documentElement.requestFullscreen();
 }
 
-// Start Test
-function startTest() {
+startBtn.onclick=startExam;
 
-    statusDiv.innerText = "Active";
-
-    addLog("Test Started");
-
-    // 30 minutes timer
-    startTimer(30 * 60);
-
-    // Enter fullscreen
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    }
-}
-
-startBtn.addEventListener("click", startTest);
-
-// Detect tab switch
-document.addEventListener("visibilitychange", function () {
-
-    if (document.hidden) {
-
+// Check tab change
+document.addEventListener("visibilitychange",function(){
+    if(document.hidden){
         tabSwitchCount++;
-
-        tabCountDiv.innerText = tabSwitchCount;
-
-        issueWarning("Tab Switched");
+        tabCount.innerText=tabSwitchCount;
+        showWarning("Tab Switched");
     }
 });
 
-// Detect focus loss
-window.addEventListener("blur", function () {
-
-    addLog("Window Lost Focus");
-});
-
-// Detect focus return
-window.addEventListener("focus", function () {
-
-    addLog("Window Focus Returned");
-});
-
-// Detect fullscreen exit
-document.addEventListener("fullscreenchange", function () {
-
-    if (!document.fullscreenElement &&
-        statusDiv.innerText === "Active") {
-
+// Check fullscreen exit
+document.addEventListener("fullscreenchange",function(){
+    if(!document.fullscreenElement){
         fullscreenExitCount++;
-
-        fullscreenCountDiv.innerText =
-            fullscreenExitCount;
-
-        issueWarning("Exited Fullscreen");
+        fullCount.innerText=fullscreenExitCount;
+        showWarning("Exited Fullscreen");
     }
 });
